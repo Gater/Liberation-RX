@@ -8,9 +8,6 @@ params [
 ];
 
 if (isNil "_sectorpos" || isNil "_classname") exitWith {objNull};
-if (_side != GRLIB_side_civilian) then {
-	diag_log format [ "Spawn Vehicle %1 at %2", _classname, time ];
-};
 
 private _vehicle = objNull;
 private _spawnpos = [];
@@ -24,8 +21,8 @@ if ( _classname isKindOf "Air" ) then {
 	} foreach _spawn_sectors;
 
 	if ( _side == GRLIB_side_civilian ) then { _airveh_alt = 150 };
-	_spawnpos = _spawnpos getPos [300, 360];
-	_spawnpos set [2, _airveh_alt];
+	_spawnpos = _spawnpos getPos [(floor random 300), random 360];
+	_spawnpos set [2, (_airveh_alt + ([[-50,0,180], 0] call F_getRND))];
 	_vehicle = createVehicle [_classname, _spawnpos, [], 50, "FLY"];
 	_vehicle allowDamage false;
 	_vehicle setDir (_vehicle getDir _sectorpos);
@@ -74,12 +71,6 @@ if ( isNull _vehicle ) exitWith {
 
 if (_side != GRLIB_side_civilian) then {
 	diag_log format [ "Spawn Vehicle %1 Pos %2 at %3", _classname, getPosATL _vehicle, time ];
-};
-
-private _vehcrew = [];
-if (_crewed) then {
-	_vehcrew = [_vehicle, _side] call F_forceCrew;
-	{ _x allowDamage false } forEach _vehcrew;
 };
 
 [_vehicle] call F_fixModVehicle;
@@ -141,24 +132,16 @@ if ( _side == GRLIB_side_enemy ) then {
 	};
 };
 
-[_vehicle, _vehcrew] spawn {
-	params ["_vehicle", "_crew"];
-	sleep 1;
-	if (_vehicle isKindOf "LandVehicle") then {
-		[_vehicle] call F_vehicleUnflip;
-		[_vehicle] call F_fixPosUnit;
-	};
-	sleep 3;
-	_vehicle setDamage 0;
-	_vehicle allowDamage true;
-	{ _x setDamage 0; _x allowDamage true } forEach _crew;
-};
-
+if ( _vehicle isKindOf "LandVehicle" ) then { [_vehicle] call F_vehicleUnflip };
+sleep 2;
+_vehicle setDamage 0;
+_vehicle allowDamage true;
 _vehicle addMPEventHandler ['MPKilled', {_this spawn kill_manager}];
 _vehicle allowCrewInImmobile [true, false];
 _vehicle setUnloadInCombat [true, false];
 
 [_vehicle] call F_clearCargo;
+if (_crewed) then {	[_vehicle, _side] call F_forceCrew };
 
 if (_side != GRLIB_side_civilian) then {
 	diag_log format [ "Done Spawning Vehicle %1 at %2", _classname , time ];

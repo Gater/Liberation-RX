@@ -156,12 +156,13 @@ if ( (!(_sector in blufor_sectors)) && (([_sector_pos, GRLIB_sector_size, GRLIB_
 		_static_count = 4;
 	};
 
-	if (opforcap >= GRLIB_opfor_cap) then { _vehtospawn = [] };
-	if (count _vehtospawn > 0) then {
+	if ( opforcap >= GRLIB_opfor_cap ) then { _vehtospawn = [] };
+	if ( count _vehtospawn > 0 ) then {
 		{
-			_vehicle = [_sector_pos, _x] call F_libSpawnVehicle;
+			private _spawn_pos = _sector_pos getPos [2 + (floor random 125), random 360];
+			_vehicle = [_spawn_pos, _x] call F_libSpawnVehicle;
 			if (!isNull _vehicle) then {
-				[group ((crew _vehicle) select 0), _sector_pos] spawn defence_ai;
+				[group ((crew _vehicle) select 0), _spawn_pos] spawn defence_ai;
 				_managed_units pushback _vehicle;
 				{ _managed_units pushback _x } foreach (crew _vehicle);
 				sleep 2;
@@ -178,7 +179,7 @@ if ( (!(_sector in blufor_sectors)) && (([_sector_pos, GRLIB_sector_size, GRLIB_
 		};
 	};
 
-	if (opforcap >= GRLIB_opfor_cap) then { _building_ai_max = 0 };
+	if ( opforcap >= GRLIB_opfor_cap ) then { _building_ai_max = 0 };
 	if ( _building_ai_max > 0 ) then {
 		_managed_units = _managed_units + ([_infsquad, _building_ai_max, _sector_pos, _building_range] call F_spawnBuildingSquad);
 		sleep 5;
@@ -236,7 +237,6 @@ if ( (!(_sector in blufor_sectors)) && (([_sector_pos, GRLIB_sector_size, GRLIB_
 		private _pilots = allPlayers select { (objectParent _x) isKindOf "Air" && (driver vehicle _x) == _x };
 		if (count _pilots > 0 ) then {
 			[getPosATL (selectRandom _pilots), GRLIB_side_enemy, 3] spawn spawn_air;
-			sleep 2;
 		};
 	};
 
@@ -246,7 +246,7 @@ if ( (!(_sector in blufor_sectors)) && (([_sector_pos, GRLIB_sector_size, GRLIB_
 
 	[ _sector_pos ] spawn {
 		params ["_pos"];
-		sleep (300 + floor(random 60));
+		sleep (300 + floor(random 120));
 		if (([_pos, GRLIB_sector_size, GRLIB_side_friendly] call F_getUnitsCount) == 0) exitWith {};
 		if ( combat_readiness > 50 ) then { [_pos, true] spawn send_paratroopers };
 		sleep 100;
