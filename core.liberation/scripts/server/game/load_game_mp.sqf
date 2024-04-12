@@ -222,6 +222,10 @@ if ( !isNil "_lrx_liberation_savegame" ) then {
 		_nextbuilding setPosWorld _nextpos;
 		_buildings_created pushback _nextbuilding;
 
+		if (GRLIB_ACE_enabled) then {
+			[_nextbuilding] call F_aceInitVehicle;
+		};
+
 		if (_nextclass iskindOf "AllVehicles") then {
 			[_nextbuilding] call F_fixModVehicle;
 		};
@@ -232,17 +236,6 @@ if ( !isNil "_lrx_liberation_savegame" ) then {
 
         if ( _nextclass in vehicle_rearm_sources ) then {
             _nextbuilding setAmmoCargo 0;
-        };
-
-        if ( _owner != "" ) then {
-			if (_owner == "public") then {
-				_nextbuilding setVariable ["GRLIB_vehicle_owner", "public", true];
-				if ( _nextclass == huron_typename ) then {
-					GRLIB_vehicle_huron = _nextbuilding;
-				};
-			} else {
-				[_nextbuilding, "lock", _owner] call F_vehicleLock;
-			};
         };
 
         if ( _nextclass in GRLIB_vehicles_light ) then {
@@ -304,6 +297,17 @@ if ( !isNil "_lrx_liberation_savegame" ) then {
 				};
 			};
 		};
+
+        if ( _owner != "" ) then {
+			if (_owner == "public") then {
+				_nextbuilding setVariable ["GRLIB_vehicle_owner", "public", true];
+				if ( _nextclass == huron_typename ) then {
+					GRLIB_vehicle_huron = _nextbuilding;
+				};
+			} else {
+				[_nextbuilding, "lock", _owner] call F_vehicleLock;
+			};
+        };
 
         if ( _hascrew ) then {
             [ _nextbuilding] call F_forceCrew;
