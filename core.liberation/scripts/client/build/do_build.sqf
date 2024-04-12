@@ -225,9 +225,9 @@ while { true } do {
 			_sphere_idx = 0;
 			{
 				if ( surfaceIsWater _truepos ) then {
-					_x setposASL ( [ _truepos, _radius, _sphere_idx * 10 ] call BIS_fnc_relPos );
+					_x setposASL (_truepos getPos [_radius, _sphere_idx * 10]);
 				} else {
-					_x setposATL ( [ _truepos, _radius, _sphere_idx * 10 ] call BIS_fnc_relPos );
+					_x setposATL (_truepos getPos [_radius, _sphere_idx * 10]);
 				};
 				_sphere_idx = _sphere_idx + 1;
 			} foreach GRLIB_preview_spheres;
@@ -384,6 +384,9 @@ while { true } do {
 			_allow_damage = true;
 			sleep 0.1;
 
+			// ACE Support
+			[_vehicle] call F_aceInitVehicle;
+
 			// Ammo Box clean inventory
 			if ( !(_classname in GRLIB_Ammobox_keep + GRLIB_disabled_arsenal) ) then {
 				[_vehicle] call F_clearCargo;
@@ -461,7 +464,7 @@ while { true } do {
 				[_vehicle, _lst_a3] call F_setCargo;
 			};
 
-			if ( count _lst_r3f > 0 && !GRLIB_ACE_enabled ) then {
+			if ( count _lst_r3f > 0 ) then {
 				[_vehicle, _lst_r3f] call load_object_direct;
 			};
 

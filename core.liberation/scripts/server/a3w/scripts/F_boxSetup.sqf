@@ -14,8 +14,10 @@ _box addMPEventHandler ["MPKilled", {_this spawn kill_manager}];
 if (isNil "_locked") then { _locked = false};
 if (_locked) then {
 	[_box, "lock", "server"] call F_vehicleLock;
+	[_box] call F_aceLockVehicle;
 } else {
 	[_box, "abandon"] call F_vehicleLock;
+	[_box] call F_aceInitVehicle;
 };
 
 if (["A3_", GRLIB_mod_west, true] call F_startsWith && _type == basic_weapon_typename) then {
